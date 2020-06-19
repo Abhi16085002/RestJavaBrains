@@ -1,5 +1,6 @@
 package org.koushik.javabrains.messenger.resources;
 
+import java.net.URI;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -11,7 +12,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import org.koushik.javabrains.messenger.model.Message;
 import org.koushik.javabrains.messenger.service.MessageService;
@@ -37,8 +41,15 @@ public class MessageResource {
 	}
 	
 	@POST
-	public Message addMessage(Message message) {
-		return messageService.addMessage(message);
+	public Response addMessage(Message message, @Context UriInfo uriInfo ) {
+		
+		Message newMessage = messageService.addMessage(message);
+		String newid = String.valueOf(newMessage.getId());
+		URI uri = uriInfo.getAbsolutePathBuilder().path(newid).build();
+		return Response.created(uri)
+				.entity(newMessage)
+				.build();
+//		return messageService.addMessage(message);
 	}
 	
 	@PUT
